@@ -190,3 +190,28 @@ body.light-theme .file-item span { color: #333 !important; }
     from { transform: translateX(0); opacity: 1; }
     to { transform: translateX(100%); opacity: 0; }
 }
+/* --- RESPONSIVE DESIGN --- */
+
+/* This rule triggers only when the screen is 600px wide or less (Phones) */
+@media (max-width: 600px) {
+    .container {
+        width: 95%; /* Use almost the whole screen width */
+        padding: 10px;
+    }
+
+    /* If you have a side-by-side layout, stack it vertically */
+    .flex-row {
+        flex-direction: column;
+    }
+
+    /* Make buttons and inputs bigger for easy tapping with fingers */
+    input, button {
+        width: 100% !important; 
+        height: 50px;
+        font-size: 16px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+}
