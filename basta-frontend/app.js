@@ -358,3 +358,27 @@ function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('collapsed');
 }
+// filter friends feature
+function filterFriends() {
+    // 1. Get the text from the search box and make it lowercase
+    const input = document.getElementById('filterFriendsInput');
+    const filter = input.value.toLowerCase();
+    
+    // 2. Get the container where your friends are listed
+    const friendsList = document.getElementById('friendsList');
+    
+    // 3. Get all the individual friend cards
+    const cards = friendsList.getElementsByClassName('file-item'); // Or 'friend-card' depending on your HTML
+
+    // 4. Loop through each card
+    for (let i = 0; i < cards.length; i++) {
+        const friendName = cards[i].innerText || cards[i].textContent;
+        
+        // 5. If the name matches the search, show it. Otherwise, hide it.
+        if (friendName.toLowerCase().indexOf(filter) > -1) {
+            cards[i].style.display = ""; // Show
+        } else {
+            cards[i].style.display = "none"; // Hide
+        }
+    }
+}

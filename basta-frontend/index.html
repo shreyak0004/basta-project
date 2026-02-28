@@ -3,14 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basta - File Sharing</title>
-    <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Basta - Secure File Sharing</title>
     <link rel="stylesheet" href="style.css">
 </head>
-    
 <body>
 
     <div class="auth-container" id="authSection">
@@ -26,29 +21,25 @@
     </div>
 
     <div class="app-layout hidden" id="dashboardSection">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
+            <button id="toggleBtn" onclick="toggleSidebar()" style="background: none; border: 1px solid #00d2ff; color: #00d2ff; cursor: pointer; margin-bottom: 10px; width: 40px; align-self: flex-end;">☰</button>
+            
             <img id="userAvatar" src="https://via.placeholder.com/80" 
                  style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid #00d2ff;">
-            <h2>My Basta.</h2>
-            <div class="sidebar" id="sidebar">
-    <button id="toggleBtn" onclick="toggleSidebar()" style="background: none; border: 1px solid #00d2ff; color: #00d2ff; cursor: pointer; margin-bottom: 10px; width: auto; align-self: flex-end;">
-        ☰
-    </button>
+            
+            <h2><span>My Basta.</span></h2>
 
-    <h2>My Basta</h2>
-    <div class="menu">
-        </div>
-</div>
             <nav class="menu">
-                <button class="menu-btn active" onclick="switchTab('home')">🏠 Home (Upload)</button>
-                <button class="menu-btn" onclick="switchTab('received')">📥 Received Files</button>
-                <button class="menu-btn" onclick="switchTab('favorites')">⭐ Favorites</button>
-                <button class="menu-btn" onclick="switchTab('friends')">👥 Friends List</button>
-                <button class="menu-btn" onclick="switchTab('settings')">⚙️ Settings</button>
+                <button class="menu-btn active" onclick="switchTab('home')">🏠 <span>Home (Upload)</span></button>
+                <button class="menu-btn" onclick="switchTab('received')">📥 <span>Received Files</span></button>
+                <button class="menu-btn" onclick="switchTab('favorites')">⭐ <span>Favorites</span></button>
+                <button class="menu-btn" onclick="switchTab('friends')">👥 <span>Friends List</span></button>
+                <button class="menu-btn" onclick="switchTab('settings')">⚙️ <span>Settings</span></button>
             </nav>
+
             <div class="sidebar-footer">
-                <button class="menu-btn" onclick="toggleTheme()">🌓 Toggle Theme</button>
-                <button class="menu-btn logout" onclick="logoutUser()">🚪 Logout</button>
+                <button class="menu-btn" onclick="toggleTheme()">🌓 <span>Toggle Theme</span></button>
+                <button class="menu-btn logout" onclick="logoutUser()">🚪 <span>Logout</span></button>
             </div>
         </aside>
 
@@ -72,14 +63,14 @@
             </section>
 
             <section id="tab-received" class="tab-window hidden">
-                <div class="my-files-section" style="margin-top: 0; border-top: none;">
+                <div class="my-files-section">
                     <h3>Files Sent Directly to You</h3>
                     <div id="receivedGallery" class="file-gallery"></div>
                 </div>
             </section>
 
             <section id="tab-favorites" class="tab-window hidden">
-                <div class="my-files-section" style="margin-top: 0; border-top: none;">
+                <div class="my-files-section">
                     <h3>My Starred Files ⭐</h3>
                     <div id="favoritesGallery" class="file-gallery"></div>
                 </div>
@@ -94,8 +85,8 @@
                 </div>
                 <div class="my-files-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h3>Quick Share with Friends</h3>
-                        <input type="text" id="filterFriendsInput" onkeyup="filterFriends()" placeholder="🔍 Filter friends..." style="width: 200px; padding: 5px; border-radius: 5px; border: 1px solid #333; background: #1a1a1a; color: white;">
+                        <h3>Quick Share</h3>
+                        <input type="text" id="filterFriendsInput" onkeyup="filterFriends()" placeholder="🔍 Filter..." style="width: 150px; padding: 5px; background: #1a1a1a; color: white; border: 1px solid #333;">
                     </div>
                     <div id="friendsList" class="file-gallery"></div>
                 </div>
@@ -104,16 +95,16 @@
             <section id="tab-settings" class="tab-window hidden">
                 <h3>Profile & Settings</h3>
                 <div class="upload-card">
-                    <div class="settings-item" style="margin-bottom: 20px;">
+                    <div class="settings-item">
                         <h4>Profile Picture</h4>
-                        <input type="file" id="avatarInput" accept="image/*" style="margin-bottom: 10px;">
-                        <button onclick="uploadAvatar()" class="select-btn">Update Avatar</button>
+                        <input type="file" id="avatarInput" accept="image/*">
+                        <button onclick="uploadAvatar()">Update Avatar</button>
                     </div>
-                    <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.1);">
+                    <hr style="margin: 20px 0; opacity: 0.1;">
                     <input type="text" id="newUsername" placeholder="New Username">
                     <button onclick="updateUsername()">Update Username</button>
-                    <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.1);">
-                    <input type="password" id="newPassword" placeholder="New Password (Roll Number)">
+                    <hr style="margin: 20px 0; opacity: 0.1;">
+                    <input type="password" id="newPassword" placeholder="New Password">
                     <button onclick="updatePassword()">Update Password</button>
                     <div id="settingsMessage" class="message"></div>
                 </div>
