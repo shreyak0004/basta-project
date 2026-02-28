@@ -352,3 +352,9 @@ window.onload = () => {
     const savedUser = localStorage.getItem('basta_username');
     if (savedUser) { showDashboard(savedUser); }
 };
+
+// toggle dashboard
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('collapsed');
+}

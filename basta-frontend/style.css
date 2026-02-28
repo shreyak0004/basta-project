@@ -91,19 +91,19 @@ button:hover { transform: translateY(-3px); }
 .secondary-btn { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); }
 
 /* --- 6. Dashboard Layout (FIXED) --- */
+/* --- 6. Dashboard Layout (FIXED FOR RESPONSIVE) --- */
 .app-layout {
     display: flex;
-    position: fixed; 
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+    width: 100%;
     background: rgba(15, 32, 39, 0.95); 
     z-index: 100;
+    flex-direction: row; /* Default: Sidebar next to content */
 }
 
 .sidebar {
     width: 260px;
+    min-width: 260px;
     background: rgba(255, 255, 255, 0.05);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
@@ -111,7 +111,6 @@ button:hover { transform: translateY(-3px); }
     padding: 20px;
     backdrop-filter: blur(10px);
 }
-
 .sidebar h2 { margin-bottom: 30px; color: #00d2ff; }
 .menu { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
 
@@ -175,12 +174,67 @@ button:hover { transform: translateY(-3px); }
 .message { margin-top: 15px; font-size: 14px; font-weight: bold; }
 
 /* --- 9. Light Theme --- */
-body.light-theme { background: #f0f2f5; color: #333; }
-body.light-theme .app-layout { background: #ffffff; }
-body.light-theme .sidebar { background: #f8f9fa; border-color: #ddd; }
-body.light-theme .menu-btn { color: #555; }
-body.light-theme .file-item span { color: #333 !important; }
+/* --- 9. Light Theme (FIXED) --- */
+body.light-theme { 
+    background: #f0f2f5; 
+    color: #1a1a1a; /* Dark text for the whole body */
+}
 
+body.light-theme .app-layout { 
+    background: #ffffff; 
+}
+
+body.light-theme .sidebar { 
+    background: #f8f9fa; 
+    border-color: #ddd; 
+}
+
+/* Fix for Sidebar Buttons and Headings */
+body.light-theme .sidebar h2 {
+    color: #1a252f;
+}
+
+body.light-theme .menu-btn { 
+    color: #444; 
+}
+
+body.light-theme .menu-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #00d2ff;
+}
+
+/* Fix for Main Content Text */
+body.light-theme .main-content {
+    color: #1a1a1a;
+}
+
+body.light-theme .main-content h1, 
+body.light-theme .main-content h3,
+body.light-theme .main-content h4 {
+    color: #1a252f;
+}
+
+/* Fix for File Cards and Gallery Items */
+body.light-theme .upload-card {
+    background: #ffffff;
+    border: 1px solid #ddd;
+}
+
+body.light-theme .file-item {
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    color: #333;
+}
+
+body.light-theme .file-item span { 
+    color: #333 !important; 
+}
+
+body.light-theme input {
+    background: #ffffff;
+    color: #333;
+    border: 1px solid #ccc;
+}
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
@@ -191,27 +245,80 @@ body.light-theme .file-item span { color: #333 !important; }
     to { transform: translateX(100%); opacity: 0; }
 }
 /* --- RESPONSIVE DESIGN --- */
-
 /* This rule triggers only when the screen is 600px wide or less (Phones) */
-@media (max-width: 600px) {
-    .container {
-        width: 95%; /* Use almost the whole screen width */
-        padding: 10px;
+@media (max-width: 768px) {
+    .app-layout {
+        flex-direction: column; /* Stacks sidebar on TOP of content on mobile */
     }
 
-    /* If you have a side-by-side layout, stack it vertically */
-    .flex-row {
+    .sidebar {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 15px;
+    }
+
+    .sidebar h2 {
+        margin-bottom: 15px;
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .menu {
+        flex-direction: row; /* Makes menu items go left-to-right on phone */
+        overflow-x: auto; /* Allows scrolling if many menu items */
+        padding-bottom: 10px;
+    }
+
+    .menu-btn {
+        white-space: nowrap; /* Prevents text from breaking into two lines */
+        padding: 8px 15px;
+    }
+
+    .main-content {
+        padding: 20px;
+        width: 100%;
+    }
+
+    /* Make login box fit phone screens */
+    .auth-container {
+        width: 90%;
+        padding: 25px;
+    }
+}
+
+/* Extra small screens (Phones) */
+@media (max-width: 480px) {
+    .file-item {
         flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
+    
+    .file-item a, .file-item button {
+        width: 100%;
+        text-align: center;
+    }
+}
 
-    /* Make buttons and inputs bigger for easy tapping with fingers */
-    input, button {
-        width: 100% !important; 
-        height: 50px;
-        font-size: 16px;
-    }
+/* Sidebar collapsed state */
+.sidebar.collapsed {
+    width: 80px;
+    min-width: 80px;
+    padding: 15px 10px;
+    overflow: hidden;
+}
 
-    h1 {
-        font-size: 24px;
-    }
+/* Hide text and large elements when collapsed */
+.sidebar.collapsed h2, 
+.sidebar.collapsed .menu-btn span,
+.sidebar.collapsed #userAvatar {
+    display: none;
+}
+
+/* Smooth transition for the sidebar */
+.sidebar {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }

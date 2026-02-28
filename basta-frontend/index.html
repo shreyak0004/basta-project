@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Basta - File Sharing</title>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Basta - Secure File Sharing</title>
     <link rel="stylesheet" href="style.css">
 </head>
+    
 <body>
 
     <div class="auth-container" id="authSection">
@@ -25,6 +30,15 @@
             <img id="userAvatar" src="https://via.placeholder.com/80" 
                  style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid #00d2ff;">
             <h2>My Basta.</h2>
+            <div class="sidebar" id="sidebar">
+    <button id="toggleBtn" onclick="toggleSidebar()" style="background: none; border: 1px solid #00d2ff; color: #00d2ff; cursor: pointer; margin-bottom: 10px; width: auto; align-self: flex-end;">
+        ☰
+    </button>
+
+    <h2>My Basta</h2>
+    <div class="menu">
+        </div>
+</div>
             <nav class="menu">
                 <button class="menu-btn active" onclick="switchTab('home')">🏠 Home (Upload)</button>
                 <button class="menu-btn" onclick="switchTab('received')">📥 Received Files</button>
