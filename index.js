@@ -407,5 +407,46 @@ cron.schedule('0 0 * * *', async () => {
     }
 });
 
+// Routes for username and pasword update
+
+// --- 6. SETTINGS UPDATES ---
+
+// Update Username
+app.put('/update-username', async (req, res) => {
+    const { userId, newUsername } = req.body;
+
+    // 1. Update the username in the 'users' table
+    const { error: userError } = await supabase
+        .from('users')
+        .update({ username: newUsername })
+        .eq('id', userId);
+
+    if (userError) return res.status(400).json({ error: userError.message });
+
+    // 2. Also update their username in the 'friends' table so others still see them
+    await supabase
+        .from('friends')
+        .update({ friend_username: newUsername })
+        .eq('friend_username', newUsername); // This keeps friend lists synced
+
+    res.json({ message: "Username updated successfully!" });
+});
+
+// Update Password (Roll Number)
+app.put('/update-password', async (req, res) => {
+    const { userId, newPassword } = req.body;
+
+    // Hash the new "password" (roll number) just like during registration
+    const salt = await bcrypt.genSalt(10);
+    const hashedRollNumber = await bcrypt.hash(newPassword, salt);
+
+    const { error } = await supabase
+        .from('users')
+        .update({ roll_hash: hashedRollNumber })
+        .eq('id', userId);
+
+    if (error) return res.status(400).json({ error: error.message });
+    res.json({ message: "Password updated successfully!" });
+});
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
