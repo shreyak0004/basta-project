@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basta - File Sharing</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="auth-container" id="authSection">
+        <h1>Welcome to Basta</h1>
+        <p>Enter your details to continue</p>
+        <input type="text" id="usernameInput" placeholder="Enter Username">
+        <input type="password" id="rollNumberInput" placeholder="Enter Roll Number">
+        <div class="button-group">
+            <button onclick="loginUser()">Login</button>
+            <button onclick="registerUser()" class="secondary-btn">Register</button>
+        </div>
+        <p id="authMessage" class="message"></p>
+    </div>
+
+    <div class="app-layout hidden" id="dashboardSection">
+        <aside class="sidebar">
+            <img id="userAvatar" src="https://via.placeholder.com/80" 
+                 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid #00d2ff;">
+            <h2>My Basta.</h2>
+            <nav class="menu">
+                <button class="menu-btn active" onclick="switchTab('home')">🏠 Home (Upload)</button>
+                <button class="menu-btn" onclick="switchTab('received')">📥 Received Files</button>
+                <button class="menu-btn" onclick="switchTab('favorites')">⭐ Favorites</button>
+                <button class="menu-btn" onclick="switchTab('friends')">👥 Friends List</button>
+                <button class="menu-btn" onclick="switchTab('settings')">⚙️ Settings</button>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="menu-btn" onclick="toggleTheme()">🌓 Toggle Theme</button>
+                <button class="menu-btn logout" onclick="logoutUser()">🚪 Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>Welcome, <span id="userGreeting" style="color: #00d2ff;">Student</span>!</h1>
+            </header>
+
+            <section id="tab-home" class="tab-window active">
+                <div class="upload-card">
+                    <h3>Share a New File</h3>
+                    <input type="file" id="fileInput">
+                    <input type="text" id="receiverInput" placeholder="Receiver Username (Optional)">
+                    <button onclick="uploadFile()">Upload File</button>
+                    <div id="uploadMessage" class="message"></div>
+                </div>
+                <div class="my-files-section">
+                    <h3>My Recently Uploaded</h3>
+                    <div id="fileGallery" class="file-gallery"></div>
+                </div>
+            </section>
+
+            <section id="tab-received" class="tab-window hidden">
+                <div class="my-files-section" style="margin-top: 0; border-top: none;">
+                    <h3>Files Sent Directly to You</h3>
+                    <div id="receivedGallery" class="file-gallery"></div>
+                </div>
+            </section>
+
+            <section id="tab-favorites" class="tab-window hidden">
+                <div class="my-files-section" style="margin-top: 0; border-top: none;">
+                    <h3>My Starred Files ⭐</h3>
+                    <div id="favoritesGallery" class="file-gallery"></div>
+                </div>
+            </section>
+
+            <section id="tab-friends" class="tab-window hidden">
+                <h3>Your Friends List</h3>
+                <div class="upload-card">
+                    <input type="text" id="friendSearchInput" placeholder="Enter friend's username">
+                    <button onclick="addFriend()">Add Friend</button>
+                    <div id="friendMessage" class="message"></div>
+                </div>
+                <div class="my-files-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3>Quick Share with Friends</h3>
+                        <input type="text" id="filterFriendsInput" onkeyup="filterFriends()" placeholder="🔍 Filter friends..." style="width: 200px; padding: 5px; border-radius: 5px; border: 1px solid #333; background: #1a1a1a; color: white;">
+                    </div>
+                    <div id="friendsList" class="file-gallery"></div>
+                </div>
+            </section>
+
+            <section id="tab-settings" class="tab-window hidden">
+                <h3>Profile & Settings</h3>
+                <div class="upload-card">
+                    <div class="settings-item" style="margin-bottom: 20px;">
+                        <h4>Profile Picture</h4>
+                        <input type="file" id="avatarInput" accept="image/*" style="margin-bottom: 10px;">
+                        <button onclick="uploadAvatar()" class="select-btn">Update Avatar</button>
+                    </div>
+                    <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.1);">
+                    <input type="text" id="newUsername" placeholder="New Username">
+                    <button onclick="updateUsername()">Update Username</button>
+                    <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.1);">
+                    <input type="password" id="newPassword" placeholder="New Password (Roll Number)">
+                    <button onclick="updatePassword()">Update Password</button>
+                    <div id="settingsMessage" class="message"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script> 
+</body>
+</html>

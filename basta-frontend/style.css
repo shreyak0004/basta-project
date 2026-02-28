@@ -1,0 +1,192 @@
+/* --- 1. Basic Setup & Font --- */
+* { 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* --- 2. The Dark Gradient Animated Background --- */
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #141e30);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite; 
+    color: #ffffff;
+    overflow-x: hidden; 
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* --- 3. The Login Box (Glassmorphism Effect) --- */
+.auth-container {
+    background: rgba(255, 255, 255, 0.05); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 40px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+    animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+@keyframes popIn {
+    0% { opacity: 0; transform: translateY(30px) scale(0.9); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.auth-container h1 { font-size: 28px; margin-bottom: 10px; letter-spacing: 1px; }
+.auth-container p { font-size: 14px; color: rgba(255, 255, 255, 0.7); margin-bottom: 30px; }
+
+/* --- 4. Inputs (Text Boxes) --- */
+input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    border-color: #00d2ff;
+    box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+}
+
+/* --- 5. Buttons (UPDATED WITH SPACING) --- */
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* This creates the space between buttons */
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+    color: white;
+}
+
+button:hover { transform: translateY(-3px); }
+.secondary-btn { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); }
+
+/* --- 6. Dashboard Layout (FIXED) --- */
+.app-layout {
+    display: flex;
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 32, 39, 0.95); 
+    z-index: 100;
+}
+
+.sidebar {
+    width: 260px;
+    background: rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.sidebar h2 { margin-bottom: 30px; color: #00d2ff; }
+.menu { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
+
+.menu-btn {
+    background: transparent;
+    text-align: left;
+    color: rgba(255,255,255,0.7);
+    padding: 12px;
+}
+
+.menu-btn.active, .menu-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #00d2ff;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 40px;
+    overflow-y: auto; 
+    color: white;
+}
+
+.tab-window { animation: popIn 0.4s ease forwards; width: 100%; }
+
+/* --- 7. Cards & Gallery --- */
+.upload-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+    max-width: 600px;
+    margin-bottom: 30px;
+}
+
+.file-item {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.file-item a, .file-item button {
+    width: auto;
+    padding: 5px 15px;
+    font-size: 12px;
+    background: transparent;
+    border: 1px solid #00d2ff;
+    color: #00d2ff;
+    text-decoration: none;
+}
+
+.file-item a:hover { background: #00d2ff; color: white; }
+
+/* --- 8. Utilities --- */
+.hidden { display: none !important; }
+
+.message { margin-top: 15px; font-size: 14px; font-weight: bold; }
+
+/* --- 9. Light Theme --- */
+body.light-theme { background: #f0f2f5; color: #333; }
+body.light-theme .app-layout { background: #ffffff; }
+body.light-theme .sidebar { background: #f8f9fa; border-color: #ddd; }
+body.light-theme .menu-btn { color: #555; }
+body.light-theme .file-item span { color: #333 !important; }
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
