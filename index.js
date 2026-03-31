@@ -220,7 +220,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const upload = multer({ storage: multer.memoryStorage() }); 
+///multer function
+const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit to keep Render happy
+});
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -447,6 +451,59 @@ app.put('/update-password', async (req, res) => {
 
     if (error) return res.status(400).json({ error: error.message });
     res.json({ message: "Password updated successfully!" });
+});
+
+// --- 7. Cosmic Notes Routes ---
+
+// Route to Save or Share a Note
+app.post('/save-note', async (req, res) => {
+    const { title, content, owner, shared_with } = req.body;
+    
+    const { data, error } = await supabase
+        .from('notes')
+        .insert([{ 
+            title, 
+            content, 
+            owner, 
+            shared_with: shared_with || null 
+        }]);
+
+    if (error) return res.status(400).json({ error: error.message });
+    res.json({ message: "Note synced to the star-chart! 🚀" });
+});
+
+// Route to Fetch Notes (Personal + Shared with Me)
+app.get('/fetch-notes/:username', async (req, res) => {
+    const username = req.params.username;
+    
+    const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        // Uses Postgres "OR" filter to get notes you own OR notes shared with you
+        .or(`owner.eq.${username},shared_with.eq.${username}`)
+        .order('created_at', { ascending: false });
+
+    if (error) return res.status(400).json({ error: error.message });
+    res.json(data);
+});
+
+// Route to Delete a Note
+app.delete('/delete-note/:id', async (req, res) => {
+    const { error } = await supabase
+        .from('notes')
+        .delete()
+        .eq('id', req.params.id);
+
+    if (error) return res.status(400).json({ error: error.message });
+    res.json({ message: "Note removed from orbit." });
+});
+
+//feedback
+app.post('/submit-feedback', async (req, res) => {
+    const { username, message } = req.body;
+    const { error } = await supabase.from('feedbacks').insert([{ username, message }]);
+    if (error) return res.status(400).json({ error: error.message });
+    res.json({ message: "Feedback received!" });
 });
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

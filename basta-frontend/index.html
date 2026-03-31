@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Basta - Secure File Sharing</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
 </head>
 <body>
 
@@ -32,9 +34,11 @@
             <nav class="menu">
                 <button class="menu-btn active" onclick="switchTab('home')">🏠 <span>Home (Upload)</span></button>
                 <button class="menu-btn" onclick="switchTab('received')">📥 <span>Received Files</span></button>
+                <button class="menu-btn" onclick="switchTab('notes')">📝 <span>Space Notes</span></button>
                 <button class="menu-btn" onclick="switchTab('favorites')">⭐ <span>Favorites</span></button>
                 <button class="menu-btn" onclick="switchTab('friends')">👥 <span>Friends List</span></button>
                 <button class="menu-btn" onclick="switchTab('settings')">⚙️ <span>Settings</span></button>
+                <button class="menu-btn" onclick="switchTab('contact')">📩 <span>Feedback</span></button>
             </nav>
 
             <div class="sidebar-footer">
@@ -109,6 +113,50 @@
                     <div id="settingsMessage" class="message"></div>
                 </div>
             </section>
+            <!-- ////////////////////// -->
+            <section id="tab-contact" class="tab-window hidden">
+    <h3>Cosmos Feedback</h3>
+    <div class="upload-card">
+        <textarea id="feedbackText" placeholder="How's your experience in space?" style="width: 100%; height: 100px; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--glass-border); padding: 10px; border-radius: 10px; margin-bottom: 10px;"></textarea>
+        <button onclick="submitFeedback()">Send to Base 🚀</button>
+        <div id="feedbackMessage" class="message"></div>
+        
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--glass-border);">
+        
+        <p>Invite friends to the Galaxy:</p>
+        <button onclick="shareSite()" class="secondary-btn" style="margin-top: 10px;">Share Link 🔗</button>
+    </div>
+</section>
+<!-- ////////////// -->
+ <!-- ///////save notes/////// -->
+<section id="tab-notes" class="tab-window hidden">
+    <header style="margin-bottom: 20px;">
+        <h1 style="font-size: 28px; font-weight: 300;">Your <span style="font-weight: 700; color: #00d2ff;">Cosmic Notes</span></h1>
+        <p style="color: #64748b;">Create personal thoughts or share them across the galaxy.</p>
+    </header>
+
+    <div class="upload-card">
+        <h4>Create a New Note</h4>
+        <input type="text" id="noteTitle" placeholder="Note Title (e.g., Engineering Project Ideas)">
+        <textarea id="noteContent" placeholder="Write your thoughts here..." style="height: 120px; width: 100%; margin-bottom: 15px; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1); outline: none;"></textarea>
+        
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="shareWithUser" placeholder="Share with: Enter Username (Optional)" style="margin-bottom: 0; flex-grow: 1;">
+            <button class="action-btn" onclick="saveNote()" style="width: 180px;">Save & Share 🚀</button>
+        </div>
+    </div>
+
+    <div class="my-files-section">
+        <h3>My Notebook</h3>
+        <div id="notesList" class="file-gallery"></div>
+    </div>
+
+    <div class="my-files-section" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+        <h3>Notes Shared With Me 📥</h3>
+        <div id="sharedNotesList" class="file-gallery"></div>
+    </div>
+</section>
+
         </main>
     </div>
 
