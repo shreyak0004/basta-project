@@ -501,4 +501,86 @@ body.light-theme input {
     cursor: pointer;
 }
 
-/* This ensures that when the browser injects <font> tags, they actually work */
+.see-more-toggle {
+    background: transparent;
+    border: 1px solid rgba(0, 210, 255, 0.4);
+    color: #00d2ff;
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 100%; /* Makes it span the width of the gallery */
+    transition: all 0.3s ease;
+}
+
+.see-more-toggle:hover {
+    background: rgba(0, 210, 255, 0.1);
+    border-color: #00d2ff;
+}
+
+/* Ensure the hidden class works */
+.extra-file.hidden {
+    display: none !important;
+}
+.see-more-text {
+    background: none;
+    border: none;
+    color: #00d2ff;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 5px;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.see-more-text:hover {
+    color: white;
+}
+
+.note-body {
+    transition: all 0.3s ease;
+    white-space: pre-wrap; /* Maintains spacing/formatting */
+}
+
+/* Styling for the Copy button */
+.copy-btn {
+    border: 1px solid #00d2ff !important;
+    color: #00d2ff !important;
+    background: transparent;
+    padding: 5px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Styling for the Delete button */
+.delete-btn {
+    border: 1px solid #ff4d4d !important;
+    color: #ff4d4d !important;
+    background: transparent;
+    padding: 5px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Hover effects for better UX */
+.copy-btn:hover { background: rgba(0, 210, 255, 0.1); }
+.delete-btn:hover { background: rgba(255, 77, 77, 0.1); }
+
+.file-item h4 {
+    margin-bottom: 8px;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.see-more-text {
+    display: inline-block;
+    margin: 10px 0;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+.see-more-text:hover {
+    color: #fff;
+    text-shadow: 0 0 8px #00d2ff;
+}

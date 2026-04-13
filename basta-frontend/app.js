@@ -144,11 +144,18 @@ async function uploadFile() {
     }
 }
 
+// async function fetchMyFiles() {
+//     const id = localStorage.getItem('basta_user_id');
+//     const res = await fetch(`${API_URL}/my-files/${id}`);
+//     const files = await res.json();
+//     renderGallery('fileGallery', files);
+// }
+
 async function fetchMyFiles() {
     const id = localStorage.getItem('basta_user_id');
     const res = await fetch(`${API_URL}/my-files/${id}`);
     const files = await res.json();
-    renderGallery('fileGallery', files);
+    renderGallery('fileGallery', files, true); // True: I am the owner
 }
 
 async function fetchReceivedFiles() {
@@ -156,35 +163,86 @@ async function fetchReceivedFiles() {
     const res = await fetch(`${API_URL}/received-files/${user}`);
     const files = await res.json();
     
-    if (files.length > lastReceivedCount && lastReceivedCount !== 0) {
-        showNotification(`You received a new file!`); 
+    if (files.length > 0) {
+        // Check if the ID of the newest file is different from what we last saw
+        const newestFileId = files[0].id; 
+        
+        if (window.lastFileId && newestFileId !== window.lastFileId) {
+            showNotification(`You received a new file: ${files[0].filename}`); 
+        }
+        
+        // Update the reference point
+        window.lastFileId = newestFileId;
     }
     
     lastReceivedCount = files.length; 
-    renderGallery('receivedGallery', files);
+    // IMPORTANT: Pass 'false' because these are RECEIVED files (user is not owner)
+    renderGallery('receivedGallery', files, false);
 }
 
-function renderGallery(elementId, files) {
+// async function fetchReceivedFiles() {
+//     const user = localStorage.getItem('basta_username');
+//     const res = await fetch(`${API_URL}/received-files/${user}`);
+//     const files = await res.json();
+    
+//     if (files.length > lastReceivedCount && lastReceivedCount !== 0) {
+//         showNotification(`You received a new file!`); 
+//     }
+    
+//     lastReceivedCount = files.length; 
+//     renderGallery('receivedGallery', files);
+// }
+
+// function renderGallery(elementId, files) {
+//     const gallery = document.getElementById(elementId);
+//     if (!gallery) return;
+//     gallery.innerHTML = files.length ? "" : "No files found.";
+//     files.forEach(f => {
+//         const item = document.createElement('div');
+//         item.className = 'file-item';
+//         item.innerHTML = `
+//             <span>📄 ${f.filename}</span>
+//             <div style="display: flex; gap: 10px; align-items: center;">
+//                 <a href="${f.file_url}" target="_blank" style="color: #00ff88; text-decoration: none; font-weight: bold;">Download</a>
+//                 <span onclick="toggleFavorite('${f.filename}', '${f.file_url}')" style="cursor:pointer;">⭐</span>
+//                 <button onclick="deleteFile('${f.id}', '${f.file_url}')" 
+//                         style="background: none; border: 1px solid #ff4d4d; color: #ff4d4d; border-radius: 20px; padding: 2px 8px; cursor: pointer; font-size: 10px;">
+//                     Delete
+//                 </button>
+//             </div>`;
+//         gallery.appendChild(item);
+//     });
+// }
+function renderGallery(elementId, files, isOwnerView) { // Added isOwnerView
     const gallery = document.getElementById(elementId);
     if (!gallery) return;
     gallery.innerHTML = files.length ? "" : "No files found.";
-    files.forEach(f => {
+
+    const limit = 3; 
+
+    files.forEach((f, index) => {
         const item = document.createElement('div');
-        item.className = 'file-item';
+        item.className = `file-item ${index >= limit ? 'extra-file hidden' : ''}`;
+        
         item.innerHTML = `
             <span>📄 ${f.filename}</span>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <a href="${f.file_url}" target="_blank" style="color: #00ff88; text-decoration: none; font-weight: bold;">Download</a>
+                <a href="${f.file_url}" target="_blank" class="download-btn">Download</a>
                 <span onclick="toggleFavorite('${f.filename}', '${f.file_url}')" style="cursor:pointer;">⭐</span>
-                <button onclick="deleteFile('${f.id}', '${f.file_url}')" 
-                        style="background: none; border: 1px solid #ff4d4d; color: #ff4d4d; border-radius: 20px; padding: 2px 8px; cursor: pointer; font-size: 10px;">
-                    Delete
-                </button>
+                <button onclick="deleteFile('${f.id}', '${f.file_url}', ${isOwnerView})" class="delete-btn">Delete</button>
             </div>`;
         gallery.appendChild(item);
     });
-}
 
+    // If there are more files than the limit, add the "See More" button
+    if (files.length > limit) {
+        const seeMoreBtn = document.createElement('button');
+        seeMoreBtn.innerText = "See More ▼";
+        seeMoreBtn.className = "see-more-toggle";
+        seeMoreBtn.onclick = () => toggleSeeMore(elementId, seeMoreBtn);
+        gallery.appendChild(seeMoreBtn);
+    }
+}
 // async function deleteFile(fileId, fileUrl) {
 //     if (!confirm("Are you sure?")) return;
 //     try {
@@ -241,7 +299,7 @@ async function deleteFile(fileId, fileUrl, isOwner) {
     // STEP 2: The "Scope" Choice
     if (isOwner) {
         // OK = Everyone (True), Cancel = Only Me (False)
-        deleteGlobal = confirm("Delete for EVERYONE? \n\n(Click 'OK' to purge for all users, or 'Cancel' to remove it only from your view)");
+        deleteGlobal = confirm("Delete for EVERYONE? \n\n(Click 'OK' to delete for all users, or 'Cancel' to remove it only from your view)");
     }
 
     try {
@@ -252,7 +310,7 @@ async function deleteFile(fileId, fileUrl, isOwner) {
         });
 
         if (response.ok) {
-            showNotification(deleteGlobal ? "File purged globally! 🚀" : "Removed from your view.");
+            showNotification(deleteGlobal ? "File deleted globally! 🚀" : "Removed from your view.");
             fetchMyFiles();
             fetchReceivedFiles();
         }
@@ -426,11 +484,19 @@ function showNotification(message) {
 }
 
 function startPolling() {
-    setInterval(() => {
-        if (localStorage.getItem('basta_user_id')) { fetchReceivedFiles(); }
+    // Clear any existing intervals to prevent "Double Polling" if the function is called twice
+    if (window.bastaPolling) clearInterval(window.bastaPolling);
+
+    window.bastaPolling = setInterval(() => {
+        const userId = localStorage.getItem('basta_user_id');
+        if (userId) { 
+            fetchReceivedFiles(); 
+            // Optional: fetchNotes() as well if you want real-time note updates
+        } else {
+            clearInterval(window.bastaPolling); // Stop if user logged out
+        }
     }, 30000); 
 }
-
 window.onload = () => {
     const savedUser = localStorage.getItem('basta_username');
     if (savedUser) { showDashboard(savedUser); }
@@ -466,20 +532,6 @@ function filterFriends() {
     }
 }
 // --- Cosmic Notes Logic ---
-// function execCmd(command, value = null) {
-//     const editor = document.getElementById('noteContent');
-//     if (!editor) return;
-
-//     // Force focus back to the editor
-//     editor.focus(); 
-
-//     // Execute the command
-//     const success = document.execCommand(command, false, value);
-    
-//     if (!success) {
-//         console.warn(`Command ${command} failed. Make sure text is selected or editor is active.`);
-//     }
-// }
 function execCmd(command, value = null) {
     const editor = document.getElementById('noteContent');
     if (!editor) return;
@@ -549,67 +601,74 @@ async function fetchNotes() {
         renderNotes(sharedWithMe, 'sharedNotesList', false);
     } catch (e) { console.error("Error fetching notes:", e); }
 }
-// function renderNotes(notes, containerId, isOwner) {
 
-// // Keep this outside the render function
-// async function copyNoteText(noteId) {
-//     const noteElement = document.getElementById(`text-${noteId}`);
-//     const textToCopy = noteElement.innerText; // Grabs plain text only
-
-//     try {
-//         await navigator.clipboard.writeText(textToCopy);
-//         showNotification("Note copied to clipboard! 🔗");
-//     } catch (err) {
-//         console.error('Failed to copy: ', err);
-//     }
-// }
-//     const container = document.getElementById(containerId);
-//     container.innerHTML = notes.length ? "" : "No notes found in this sector.";
-
-//     notes.forEach(note => {
-//         const div = document.createElement('div');
-//         div.className = 'file-item';
-//         div.innerHTML = `
-//             <div style="flex-grow: 1;">
-//                 <h4 style="color: #00d2ff;">${note.title}</h4>
-//                 <p style="font-size: 14px; opacity: 0.8;">${note.content}</p>
-//                 <small style="color: #64748b;">${isOwner ? (note.shared_with ? `Shared with ${note.shared_with}` : 'Private') : `From ${note.owner}`}</small>
-//             </div>
-//             <button onclick="deleteNote(${note.id})" style="border: 1px solid #ff4d4d; color: #ff4d4d; background: none; cursor: pointer; padding: 5px; border-radius: 5px;">🗑️</button>
-//         `;
-//         container.appendChild(div);
-//     });
-// }
 function renderNotes(notes, containerId, isOwner) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = notes.length ? "" : "No notes found in this sector.";
 
-    notes.forEach(note => {
+    const listLimit = 3; 
+    const textLimit = 150; 
+
+    notes.forEach((note, index) => {
         const div = document.createElement('div');
-        div.className = 'file-item';
+        // Handle Global List Visibility
+        div.className = `file-item ${index >= listLimit ? 'extra-note hidden' : ''}`;
+        
+        // Handle Individual Text Truncation
+        const isTextLong = note.content.length > textLimit;
+        const displayContent = isTextLong ? note.content.substring(0, textLimit) + "..." : note.content;
+
+        // NOTE: Changed ID to 'note-content-' to match your copyNoteText function
         div.innerHTML = `
             <div style="flex-grow: 1;">
                 <h4 style="color: #00d2ff;">${note.title}</h4>
-                <div id="note-content-${note.id}" style="font-size: 14px; opacity: 0.8;">${note.content}</div>
-                <small style="color: #64748b;">
+                <div id="note-content-${note.id}" style="font-size: 14px; opacity: 0.8; white-space: pre-wrap;">${displayContent}</div>
+                
+                
+${isTextLong ? `<button class="see-more-text" onclick="toggleNoteContent(this, '${note.id}', '${encodeURIComponent(note.content)}')">Read More</button>` : ''}
+                
+                <small style="color: #64748b; display: block; margin-top: 5px;">
                     ${isOwner ? (note.shared_with ? `Shared with ${note.shared_with}` : 'Private') : `From ${note.owner}`}
                 </small>
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
-                <button onclick="copyNoteText('${note.id}')" title="Copy" style="background:none; border:1px solid #00d2ff; cursor:pointer; padding:5px; border-radius:5px;">📋</button>
-                <button onclick="deleteNote(${note.id})" style="border: 1px solid #ff4d4d; color: #ff4d4d; background: none; cursor: pointer; padding: 5px; border-radius: 5px;">🗑️</button>
+                <button onclick="copyNoteText('${note.id}')" title="Copy" class="copy-btn">📋</button>
+                <button onclick="deleteNote('${note.id}')" title="Delete" class="delete-btn">🗑️</button>
             </div>`;
+            
         container.appendChild(div);
     });
-}
 
+    // Global See More (For the whole list)
+    if (notes.length > listLimit) {
+        const globalBtn = document.createElement('button');
+        globalBtn.innerText = "Show More Notes ▼";
+        globalBtn.className = "see-more-toggle"; 
+        globalBtn.onclick = () => toggleGlobalNotes(containerId, globalBtn);
+        container.appendChild(globalBtn);
+    }
+}
+// async function deleteNote(id) {
+//     if (!confirm("Delete note?")) return;
+//     const res = await fetch(`${API_URL}/delete-note/${id}`, { method: 'DELETE' });
+//     if (res.ok) fetchNotes();
+// }
 async function deleteNote(id) {
     if (!confirm("Delete note?")) return;
-    const res = await fetch(`${API_URL}/delete-note/${id}`, { method: 'DELETE' });
-    if (res.ok) fetchNotes();
-}
+    
+    // Get the current user to verify ownership on the backend
+    const owner = localStorage.getItem('basta_username');
 
+    try {
+        const res = await fetch(`${API_URL}/delete-note/${id}`, { 
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ owner }) // Pass the owner in the body
+        });
+        if (res.ok) fetchNotes();
+    } catch (e) { console.error("Delete Error", e); }
+}
 //Feedback
 async function submitFeedback() {
     const content = document.getElementById('feedbackText').value;
@@ -638,4 +697,71 @@ async function copyNoteText(noteId) {
     } catch (err) {
         console.error('Failed to copy: ', err);
     }
+}
+
+function toggleSeeMore(galleryId, btn) {
+    const gallery = document.getElementById(galleryId);
+    const extraFiles = gallery.querySelectorAll('.extra-file');
+    
+    const isExpanded = btn.innerText.includes("Less");
+
+    extraFiles.forEach(file => {
+        if (isExpanded) {
+            file.classList.add('hidden');
+        } else {
+            file.classList.remove('hidden');
+        }
+    });
+
+    btn.innerText = isExpanded ? "See More ▼" : "See Less ▲";
+}
+// Function 1: Expands the text INSIDE a single note
+// function toggleNoteContent(btn, noteId, fullContentEncoded) {
+//     const noteBody = document.getElementById(`note-text-${noteId}`);
+//     const fullContent = decodeURIComponent(fullContentEncoded);
+    
+//     if (btn.innerText === "Read More") {
+//         noteBody.innerHTML = fullContent;
+//         btn.innerText = "Read Less";
+//     } else {
+//         noteBody.innerHTML = fullContent.substring(0, 150) + "...";
+//         btn.innerText = "Read More";
+//     }
+// }
+
+function toggleNoteContent(btn, noteId, fullContentEncoded) {
+    // 1. Force the ID to a string and trim it to be 100% sure
+    const cleanId = String(noteId).trim();
+    const targetId = `note-content-${cleanId}`;
+    
+    const noteBody = document.getElementById(targetId);
+    
+    if (!noteBody) {
+        console.error("DOM Error: Could not find element with ID:", targetId);
+        return;
+    }
+
+    const fullContent = decodeURIComponent(fullContentEncoded);
+    const isExpanded = btn.innerText === "Read Less";
+
+    if (!isExpanded) {
+        noteBody.innerHTML = fullContent;
+        btn.innerText = "Read Less";
+    } else {
+        noteBody.innerHTML = fullContent.substring(0, 150) + "...";
+        btn.innerText = "Read More";
+    }
+}
+
+// Function 2: Expands the WHOLE LIST of notes
+function toggleGlobalNotes(containerId, btn) {
+    const container = document.getElementById(containerId);
+    const extraNotes = container.querySelectorAll('.extra-note');
+    const isExpanded = btn.innerText.includes("Less");
+
+    extraNotes.forEach(note => {
+        isExpanded ? note.classList.add('hidden') : note.classList.remove('hidden');
+    });
+
+    btn.innerText = isExpanded ? "Show More Notes ▼" : "Show Less Notes ▲";
 }
