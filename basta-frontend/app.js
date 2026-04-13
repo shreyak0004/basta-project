@@ -201,30 +201,65 @@ function renderGallery(elementId, files) {
 //     } catch (e) { console.error("Delete error:", e); }
 // }
 
+// async function deleteFile(fileId, fileUrl, isOwner) {
+//     let deleteGlobal = false;
+
+//     // Only the owner (sender) can choose to delete for everyone
+//     if (isOwner) {
+//         deleteGlobal = confirm("Delete for EVERYONE? (Cancel to delete for only yourself)");
+//     }
+
+//     if (deleteGlobal) {
+//         // 1. Remove from Storage
+//         const fileName = fileUrl.split('/').pop();
+//         // await supabase.storage.from('uploads').remove([fileName]);
+
+//         // // 2. Remove all entries with this URL (Global Delete)
+//         // await supabase.from('files').delete().eq('file_url', fileUrl);
+//         const response = await fetch(`${API_URL}/delete-file`, {
+//     method: 'DELETE',
+//     headers: { 'Content-Type': 'application/json' },
+//     body: JSON.stringify({ fileId, fileUrl })
+// });
+//         alert("File deleted for all users.");
+//     } else {
+//         // Just delete the specific row for the current user (Self Delete)
+//         await supabase.from('files').delete().eq('id', fileId); 
+//         alert("File removed from your view.");
+//     }
+//     fetchFiles(); // Refresh the gallery
+// }
+
 async function deleteFile(fileId, fileUrl, isOwner) {
+    // STEP 1: The "Oops" Protector
+    // If they click Cancel here, the whole function STOPS.
+    const proceed = confirm("Are you sure you want to delete this file?");
+    if (!proceed) return; 
+
     let deleteGlobal = false;
 
-    // Only the owner (sender) can choose to delete for everyone
+    // STEP 2: The "Scope" Choice
     if (isOwner) {
-        deleteGlobal = confirm("Delete for EVERYONE? (Cancel to delete for only yourself)");
+        // OK = Everyone (True), Cancel = Only Me (False)
+        deleteGlobal = confirm("Delete for EVERYONE? \n\n(Click 'OK' to purge for all users, or 'Cancel' to remove it only from your view)");
     }
 
-    if (deleteGlobal) {
-        // 1. Remove from Storage
-        const fileName = fileUrl.split('/').pop();
-        await supabase.storage.from('uploads').remove([fileName]);
+    try {
+        const response = await fetch(`${API_URL}/delete-file`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileId, fileUrl, deleteGlobal })
+        });
 
-        // 2. Remove all entries with this URL (Global Delete)
-        await supabase.from('files').delete().eq('file_url', fileUrl);
-        alert("File deleted for all users.");
-    } else {
-        // Just delete the specific row for the current user (Self Delete)
-        await supabase.from('files').delete().eq('id', fileId); 
-        alert("File removed from your view.");
+        if (response.ok) {
+            showNotification(deleteGlobal ? "File purged globally! 🚀" : "Removed from your view.");
+            fetchMyFiles();
+            fetchReceivedFiles();
+        }
+    } catch (e) {
+        console.error("Delete error:", e);
     }
-    fetchFiles(); // Refresh the gallery
 }
-
 // --- 4. FRIENDS LOGIC ---
 async function addFriend() {
     const friendUsername = document.getElementById('friendSearchInput').value;
@@ -430,6 +465,38 @@ function filterFriends() {
         }
     }
 }
+// --- Cosmic Notes Logic ---
+// function execCmd(command, value = null) {
+//     const editor = document.getElementById('noteContent');
+//     if (!editor) return;
+
+//     // Force focus back to the editor
+//     editor.focus(); 
+
+//     // Execute the command
+//     const success = document.execCommand(command, false, value);
+    
+//     if (!success) {
+//         console.warn(`Command ${command} failed. Make sure text is selected or editor is active.`);
+//     }
+// }
+function execCmd(command, value = null) {
+    const editor = document.getElementById('noteContent');
+    if (!editor) return;
+
+    editor.focus();
+
+    if (command === 'fontName') {
+        // Force the command specifically for fonts
+        document.execCommand('fontName', false, value);
+    } else {
+        document.execCommand(command, false, value);
+    }
+}
+
+async function saveNote() {
+    // ... your existing save logic
+}
 //notes section
 // --- Cosmic Notes Logic ---
 
@@ -438,11 +505,16 @@ function filterFriends() {
 
 async function saveNote() {
     const title = document.getElementById('noteTitle').value.trim();
-    const content = document.getElementById('noteContent').value.trim();
+    const content = document.getElementById('noteContent').innerHTML; 
     const shared_with = document.getElementById('shareWithUser').value.trim();
     const owner = localStorage.getItem('basta_username');
 
-    if (!title || !content) return alert("Note needs a title and content!");
+    // Use innerText to check if there is actual text, not just hidden HTML tags
+    const plainText = document.getElementById('noteContent').innerText.trim();
+
+    if (!title || !plainText) {
+        return alert("Note needs a title and content!");
+    }
 
     try {
         const response = await fetch(`${API_URL}/save-note`, {
@@ -454,20 +526,22 @@ async function saveNote() {
         if (response.ok) {
             alert("Note Saved! ✨");
             document.getElementById('noteTitle').value = "";
-            document.getElementById('noteContent').value = "";
+            document.getElementById('noteContent').innerHTML = ""; // Correct way to clear a div
             document.getElementById('shareWithUser').value = "";
-            fetchNotes(); // Refresh list
+            fetchNotes(); 
         }
     } catch (e) { console.error("Error saving note:", e); }
 }
-
 async function fetchNotes() {
     const username = localStorage.getItem('basta_username');
+    if (!username) return;
+
     try {
         const response = await fetch(`${API_URL}/fetch-notes/${username}`);
+        if (!response.ok) throw new Error("Failed to fetch");
+        
         const allNotes = await response.json();
 
-        // Filter notes into local lists
         const myNotes = allNotes.filter(n => n.owner === username);
         const sharedWithMe = allNotes.filter(n => n.shared_with === username);
 
@@ -475,9 +549,40 @@ async function fetchNotes() {
         renderNotes(sharedWithMe, 'sharedNotesList', false);
     } catch (e) { console.error("Error fetching notes:", e); }
 }
+// function renderNotes(notes, containerId, isOwner) {
 
+// // Keep this outside the render function
+// async function copyNoteText(noteId) {
+//     const noteElement = document.getElementById(`text-${noteId}`);
+//     const textToCopy = noteElement.innerText; // Grabs plain text only
+
+//     try {
+//         await navigator.clipboard.writeText(textToCopy);
+//         showNotification("Note copied to clipboard! 🔗");
+//     } catch (err) {
+//         console.error('Failed to copy: ', err);
+//     }
+// }
+//     const container = document.getElementById(containerId);
+//     container.innerHTML = notes.length ? "" : "No notes found in this sector.";
+
+//     notes.forEach(note => {
+//         const div = document.createElement('div');
+//         div.className = 'file-item';
+//         div.innerHTML = `
+//             <div style="flex-grow: 1;">
+//                 <h4 style="color: #00d2ff;">${note.title}</h4>
+//                 <p style="font-size: 14px; opacity: 0.8;">${note.content}</p>
+//                 <small style="color: #64748b;">${isOwner ? (note.shared_with ? `Shared with ${note.shared_with}` : 'Private') : `From ${note.owner}`}</small>
+//             </div>
+//             <button onclick="deleteNote(${note.id})" style="border: 1px solid #ff4d4d; color: #ff4d4d; background: none; cursor: pointer; padding: 5px; border-radius: 5px;">🗑️</button>
+//         `;
+//         container.appendChild(div);
+//     });
+// }
 function renderNotes(notes, containerId, isOwner) {
     const container = document.getElementById(containerId);
+    if (!container) return;
     container.innerHTML = notes.length ? "" : "No notes found in this sector.";
 
     notes.forEach(note => {
@@ -486,11 +591,15 @@ function renderNotes(notes, containerId, isOwner) {
         div.innerHTML = `
             <div style="flex-grow: 1;">
                 <h4 style="color: #00d2ff;">${note.title}</h4>
-                <p style="font-size: 14px; opacity: 0.8;">${note.content}</p>
-                <small style="color: #64748b;">${isOwner ? (note.shared_with ? `Shared with ${note.shared_with}` : 'Private') : `From ${note.owner}`}</small>
+                <div id="note-content-${note.id}" style="font-size: 14px; opacity: 0.8;">${note.content}</div>
+                <small style="color: #64748b;">
+                    ${isOwner ? (note.shared_with ? `Shared with ${note.shared_with}` : 'Private') : `From ${note.owner}`}
+                </small>
             </div>
-            <button onclick="deleteNote(${note.id})" style="border: 1px solid #ff4d4d; color: #ff4d4d; background: none; cursor: pointer; padding: 5px; border-radius: 5px;">🗑️</button>
-        `;
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button onclick="copyNoteText('${note.id}')" title="Copy" style="background:none; border:1px solid #00d2ff; cursor:pointer; padding:5px; border-radius:5px;">📋</button>
+                <button onclick="deleteNote(${note.id})" style="border: 1px solid #ff4d4d; color: #ff4d4d; background: none; cursor: pointer; padding: 5px; border-radius: 5px;">🗑️</button>
+            </div>`;
         container.appendChild(div);
     });
 }
@@ -517,4 +626,16 @@ function shareSite() {
     }).catch(err => {
         console.error('Failed to copy: ', err);
     });
+}
+async function copyNoteText(noteId) {
+    const noteElement = document.getElementById(`note-content-${noteId}`);
+    if (!noteElement) return console.error("Note element not found");
+    
+    const textToCopy = noteElement.innerText;
+    try {
+        await navigator.clipboard.writeText(textToCopy);
+        showNotification("Note copied to clipboard! 🔗");
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+    }
 }

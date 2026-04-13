@@ -14,11 +14,11 @@
         <h1>Welcome to Basta</h1>
         <p>Enter your details to continue</p>
         <input type="text" id="usernameInput" placeholder="Enter Username">
-        <input type="password" id="rollNumberInput" placeholder="Enter Roll Number">
+        <input type="password" id="rollNumberInput" placeholder="Enter Password">
         <div class="button-group">
             <button onclick="loginUser()">Login</button>
             <button onclick="registerUser()" class="secondary-btn">Register</button>
-        </div>
+            <p>Click register if you are a new user!</p>        </div>
         <p id="authMessage" class="message"></p>
     </div>
 
@@ -135,11 +135,37 @@
         <p style="color: #64748b;">Create personal thoughts or share them across the galaxy.</p>
     </header>
 
-    <div class="upload-card">
-        <h4>Create a New Note</h4>
-        <input type="text" id="noteTitle" placeholder="Note Title (e.g., Engineering Project Ideas)">
-        <textarea id="noteContent" placeholder="Write your thoughts here..." style="height: 120px; width: 100%; margin-bottom: 15px; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1); outline: none;"></textarea>
+   <div class="upload-card">
+    <h4>Create a New Note</h4>
+    <div class="notes-container">
+        <input type="text" id="noteTitle" placeholder="Note Title..." class="note-input-title">
         
+        <div class="note-toolbar" style="margin-bottom: 5px; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 8px 8px 0 0; display: flex; gap: 5px;">
+            <button type="button" onclick="execCmd('bold')" title="Bold"><b>B</b></button>
+            <button type="button" onclick="execCmd('italic')" title="Italic"><i>I</i></button>
+            <button type="button" onclick="execCmd('underline')" title="Underline"><u>U</u></button>
+                      <select onchange="execCmd('fontName', this.value)" class="font-select">
+    <option value="Arial">Arial</option>
+    <option value="Courier New">Courier</option>
+    <option value="Georgia">Georgia</option>
+    <option value="Times New Roman">Times New Roman</option>
+    <option value="Verdana">Verdana</option>
+</select>
+<label class="color-picker-wrapper" title="Text Color">
+    <span class="picker-label">Color 🎨</span>
+    <span class="dropdown-arrow"> ▼ </span>
+    <input type="color" 
+           onchange="execCmd('foreColor', this.value)" 
+           class="hidden-color-input">
+</label>
+        </div>
+
+        <div id="noteContent" 
+             contenteditable="true" 
+             style="min-height: 120px; width: 100%; margin-bottom: 15px; padding: 12px; border-radius: 0 0 12px 12px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1); outline: none; overflow-y: auto;"
+             data-placeholder="Write your thoughts here..."></div>
+    </div>
+
         <div style="display: flex; gap: 10px; align-items: center;">
             <input type="text" id="shareWithUser" placeholder="Share with: Enter Username (Optional)" style="margin-bottom: 0; flex-grow: 1;">
             <button class="action-btn" onclick="saveNote()" style="width: 180px;">Save & Share 🚀</button>
@@ -155,6 +181,7 @@
         <h3>Notes Shared With Me 📥</h3>
         <div id="sharedNotesList" class="file-gallery"></div>
     </div>
+     </div>
 </section>
 
         </main>

@@ -318,18 +318,41 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 // MISSING ROUTE ADDED: Delete File
+// app.delete('/delete-file', async (req, res) => {
+//     const { fileId, fileUrl } = req.body;
+//     const fileName = fileUrl.split('/').pop();
+
+//     // Remove from Storage
+//     await supabase.storage.from('basta_files').remove([fileName]);
+
+//     // Remove from Database
+//     const { error } = await supabase.from('files').delete().eq('id', fileId);
+
+//     if (error) return res.status(400).json({ error: error.message });
+//     res.json({ message: "File deleted successfully!" });
+// });
 app.delete('/delete-file', async (req, res) => {
-    const { fileId, fileUrl } = req.body;
+    const { fileId, fileUrl, deleteGlobal } = req.body;
     const fileName = fileUrl.split('/').pop();
 
-    // Remove from Storage
-    await supabase.storage.from('basta_files').remove([fileName]);
+    try {
+        if (deleteGlobal) {
+            // 1. GLOBAL DELETE: Remove from Storage Bucket
+            await supabase.storage.from('basta_files').remove([fileName]);
+            
+            // 2. GLOBAL DELETE: Remove all database entries for this specific file URL
+            const { error } = await supabase.from('files').delete().eq('file_url', fileUrl);
+            if (error) throw error;
+        } else {
+            // 3. LOCAL DELETE: Just remove this specific entry for this user
+            const { error } = await supabase.from('files').delete().eq('id', fileId);
+            if (error) throw error;
+        }
 
-    // Remove from Database
-    const { error } = await supabase.from('files').delete().eq('id', fileId);
-
-    if (error) return res.status(400).json({ error: error.message });
-    res.json({ message: "File deleted successfully!" });
+        res.json({ message: "Orbit cleared! 🚀" });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 });
 
 app.get('/my-files/:userId', async (req, res) => {
