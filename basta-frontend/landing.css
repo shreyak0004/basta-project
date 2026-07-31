@@ -1,0 +1,817 @@
+/* ============================================
+   BASTA LANDING PAGE - Cosmo Space Theme
+   Scoped under .landing-page to avoid conflicts
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* --- CSS Variables (Landing Cosmo Theme) --- */
+:root {
+    --land-space-dark: #020208;
+    --land-space-mid: #0a0b1e;
+    --land-space-light: #0d1127;
+    --land-space-pale: #e2eafc;
+    --land-cyan: #00b4d8;
+    --land-cyan-glow: rgba(0, 180, 216, 0.3);
+    --land-blue: #0077b6;
+    --land-blue-light: #90e0ef;
+    --land-blue-dark: #03045e;
+    --land-gold: #f4e285;
+    --land-text-light: #f1f5f9;
+    --land-text-dark: #0f172a;
+    --land-shadow: rgba(0, 0, 0, 0.4);
+    
+    /* Premium Glassmorphism */
+    --glass-bg: rgba(13, 17, 39, 0.45);
+    --glass-bg-hover: rgba(20, 26, 56, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-border-hover: rgba(0, 180, 216, 0.2);
+}
+
+/* Starfield Background Container */
+.space-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--land-space-dark);
+}
+
+.stars, .twinkling {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.stars {
+    background: #020208 url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Ccircle cx="5" cy="5" r="1" fill="%23fff"/%3E%3Ccircle cx="120" cy="80" r="1.5" fill="%23fff" opacity="0.8"/%3E%3Ccircle cx="280" cy="150" r="1" fill="%23fff" opacity="0.6"/%3E%3Ccircle cx="70" cy="280" r="1" fill="%23fff" opacity="0.9"/%3E%3Ccircle cx="210" cy="340" r="1.2" fill="%23fff" opacity="0.7"/%3E%3Ccircle cx="340" cy="30" r="1.5" fill="%23fff" opacity="0.5"/%3E%3Ccircle cx="310" cy="270" r="1" fill="%23fff" opacity="0.8"/%3E%3Ccircle cx="150" cy="220" r="1" fill="%23fff" opacity="0.6"/%3E%3C/svg%3E') repeat;
+    z-index: 0;
+}
+
+.twinkling {
+    background: transparent url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Ccircle cx="50" cy="50" r="2" fill="%23fff" opacity="0.5"%3E%3Canimate attributeName="opacity" values="0.2;0.9;0.2" dur="5s" repeatCount="indefinite"/%3E%3C/circle%3E%3Ccircle cx="180" cy="120" r="1.5" fill="%23fff" opacity="0.6"%3E%3Canimate attributeName="opacity" values="0.1;0.8;0.1" dur="7s" repeatCount="indefinite"/%3E%3C/circle%3E%3Ccircle cx="320" cy="60" r="2.5" fill="%23fff" opacity="0.8"%3E%3Canimate attributeName="opacity" values="0.3;1;0.3" dur="4s" repeatCount="indefinite"/%3E%3C/circle%3E%3Ccircle cx="90" cy="200" r="1" fill="%23fff" opacity="0.4"%3E%3Canimate attributeName="opacity" values="0.1;0.6;0.1" dur="6s" repeatCount="indefinite"/%3E%3C/circle%3E%3Ccircle cx="260" cy="240" r="2" fill="%23fff" opacity="0.6"%3E%3Canimate attributeName="opacity" values="0.2;0.9;0.2" dur="8s" repeatCount="indefinite"/%3E%3C/circle%3E%3Ccircle cx="30" cy="310" r="1.5" fill="%23fff" opacity="0.5"%3E%3Canimate attributeName="opacity" values="0.1;0.7;0.1" dur="5s" repeatCount="indefinite"/%3E%3C/circle%3E%3C/svg%3E') repeat;
+    z-index: 1;
+    animation: move-twink-back 180s linear infinite;
+}
+
+@keyframes move-twink-back {
+    from { background-position: 0 0; }
+    to { background-position: -1000px 1000px; }
+}
+
+/* --- Landing Page Root --- */
+.landing-page {
+    font-family: 'Poppins', sans-serif;
+    background: transparent;
+    color: var(--land-text-light);
+    overflow-x: hidden;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 2;
+}
+
+.landing-page * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===== HERO SECTION ===== */
+.landing-hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 80px 60px;
+    background: radial-gradient(circle at 20% 30%, rgba(13, 17, 39, 0.3) 0%, rgba(2, 2, 8, 0.8) 100%);
+    overflow: hidden;
+}
+
+/* Nebula drift effect */
+.landing-hero::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 60%;
+    height: 70%;
+    background: radial-gradient(circle, rgba(0, 180, 216, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+    filter: blur(80px);
+}
+
+.landing-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -10%;
+    width: 50%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(3, 4, 94, 0.25) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+    filter: blur(80px);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 5;
+    max-width: 540px;
+    animation: heroFadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-content h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 4.2rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--land-text-light);
+    margin-bottom: 24px;
+    letter-spacing: -1px;
+}
+
+.hero-content h1 span {
+    display: block;
+    background: linear-gradient(135deg, var(--land-cyan) 0%, var(--land-blue-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(0, 180, 216, 0.15);
+}
+
+.hero-content p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: rgba(241, 245, 249, 0.7);
+    margin-bottom: 36px;
+    max-width: 440px;
+}
+
+.hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 36px;
+    background: linear-gradient(135deg, var(--land-cyan) 0%, var(--land-blue) 100%);
+    color: var(--land-space-dark);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 20px var(--land-cyan-glow);
+    text-decoration: none;
+    letter-spacing: 1px;
+}
+
+.hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 180, 216, 0.5), 0 0 15px rgba(0, 180, 216, 0.3);
+    color: #ffffff;
+}
+
+.hero-cta svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    transition: transform 0.3s ease;
+}
+
+.hero-cta:hover svg {
+    transform: translateX(4px);
+}
+
+/* Weightless Floating Astronaut */
+.hero-image {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45%;
+    max-width: 620px;
+    max-height: 75vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 4;
+    animation: astronautFloat 8s ease-in-out infinite;
+}
+
+@keyframes astronautFloat {
+    0%, 100% {
+        transform: translateY(-50%) translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-50%) translateY(-15px) rotate(1.5deg);
+    }
+}
+
+.hero-image img {
+    max-width: 100%;
+    max-height: 75vh;
+    width: auto;
+    height: auto;
+    filter: drop-shadow(0 15px 35px rgba(0, 180, 216, 0.2));
+    object-fit: contain;
+}
+
+/* Navigation - Space Station Dock */
+.landing-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(3, 3, 13, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-nav.scrolled {
+    padding: 14px 60px;
+    background: rgba(2, 2, 8, 0.85);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.nav-logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: none;
+    letter-spacing: 2px;
+}
+
+.nav-logo span {
+    color: var(--land-cyan);
+    text-shadow: 0 0 10px var(--land-cyan-glow);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+}
+
+.nav-links a {
+    color: rgba(241, 245, 249, 0.7);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--land-cyan);
+    box-shadow: 0 0 8px var(--land-cyan);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #ffffff;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+.nav-btn {
+    padding: 10px 24px;
+    background: rgba(0, 180, 216, 0.1);
+    color: var(--land-cyan) !important;
+    border: 1px solid rgba(0, 180, 216, 0.3);
+    border-radius: 50px;
+    font-weight: 600;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+    background: rgba(0, 180, 216, 0.2);
+    border-color: var(--land-cyan);
+    box-shadow: 0 0 15px var(--land-cyan-glow);
+}
+
+.nav-btn::after {
+    display: none !important;
+}
+
+/* ===== FEATURES SECTION ===== */
+.landing-features {
+    position: relative;
+    padding: 100px 60px;
+    background: transparent;
+    overflow: hidden;
+}
+
+.features-header {
+    text-align: center;
+    margin-bottom: 60px;
+    position: relative;
+    z-index: 2;
+}
+
+.features-header h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.features-header p {
+    color: rgba(241, 245, 249, 0.6);
+    font-size: 1rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 1140px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.feature-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 36px 24px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--land-cyan), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-6px);
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+    box-shadow: 0 15px 35px rgba(0, 180, 216, 0.1);
+}
+
+.feature-card:hover::before {
+    opacity: 1;
+}
+
+.feature-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 180, 216, 0.1);
+    border-radius: 14px;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    background: rgba(0, 180, 216, 0.2);
+    transform: scale(1.05);
+}
+
+.feature-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--land-cyan);
+    fill: none;
+    stroke-width: 1.8;
+}
+
+.feature-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #ffffff;
+}
+
+.feature-card p {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: rgba(241, 245, 249, 0.6);
+}
+
+/* ===== SERVICES BENTO GRID ===== */
+.landing-services {
+    padding: 100px 60px;
+    background: transparent;
+    position: relative;
+    z-index: 2;
+}
+
+.services-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.services-header h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.services-header p {
+    color: rgba(241, 245, 249, 0.6);
+    font-size: 1rem;
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+    gap: 20px;
+    max-width: 1140px;
+    margin: 0 auto;
+}
+
+.bento-card {
+    border-radius: 20px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    min-height: 190px;
+    cursor: pointer;
+}
+
+.bento-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.4) 100%);
+    pointer-events: none;
+    border-radius: 20px;
+}
+
+.bento-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 180, 216, 0.05);
+}
+
+/* Card Variants - Cyber-themed glass colors */
+.bento-green {
+    background: rgba(0, 180, 216, 0.05);
+}
+
+.bento-brown {
+    background: rgba(13, 17, 39, 0.5);
+}
+
+.bento-dark {
+    background: rgba(3, 4, 94, 0.15);
+}
+
+.bento-cream {
+    background: rgba(226, 234, 252, 0.03);
+}
+
+.bento-forest {
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--glass-border);
+}
+
+.bento-card-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    z-index: 2;
+    background: rgba(0, 180, 216, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.bento-card:hover .bento-card-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.bento-card-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: var(--land-cyan);
+    stroke-width: 1.8;
+}
+
+.bento-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    z-index: 2;
+    margin-bottom: 6px;
+    color: #ffffff;
+}
+
+.bento-card p {
+    font-size: 0.85rem;
+    color: rgba(241, 245, 249, 0.6);
+    z-index: 2;
+}
+
+/* Wide card */
+.bento-wide {
+    grid-column: span 2;
+}
+
+.bento-forest-content {
+    z-index: 2;
+    background: rgba(2, 2, 8, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 20px 30px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Arrow icon for link card */
+.bento-arrow {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.bento-card:hover .bento-arrow {
+    background: rgba(0, 180, 216, 0.15);
+    border-color: var(--land-cyan);
+    transform: translate(2px, -2px);
+}
+
+.bento-arrow svg {
+    width: 16px;
+    height: 16px;
+    stroke: #ffffff;
+    fill: none;
+    stroke-width: 2;
+}
+
+/* ===== FOOTER ===== */
+.landing-footer {
+    padding: 40px 60px;
+    background: rgba(2, 2, 8, 0.8);
+    text-align: center;
+    border-top: 1px solid var(--glass-border);
+    position: relative;
+    z-index: 2;
+}
+
+.landing-footer p {
+    color: rgba(241, 245, 249, 0.4);
+    font-size: 0.88rem;
+}
+
+.landing-footer a {
+    color: var(--land-cyan);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.landing-footer a:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px var(--land-cyan);
+}
+
+/* ===== SCROLL ANIMATIONS ===== */
+.reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .hero-content h1 { font-size: 3.2rem; }
+    .hero-image { width: 45%; right: 10px; }
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .bento-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .landing-hero {
+        padding: 120px 30px 60px;
+        flex-direction: column;
+        text-align: center;
+        min-height: auto;
+    }
+
+    .hero-content {
+        max-width: 100%;
+    }
+
+    .hero-content h1 {
+        font-size: 2.8rem;
+    }
+
+    .hero-content p {
+        max-width: 100%;
+    }
+
+    .hero-image {
+        position: relative;
+        right: 0;
+        top: 0;
+        transform: none;
+        width: 80%;
+        max-width: 400px;
+        margin-top: 40px;
+        animation: heroAstronautFloatMobile 6s ease-in-out infinite;
+    }
+
+    @keyframes heroAstronautFloatMobile {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: rotate(1deg) translateY(-10px); }
+    }
+
+    .landing-nav {
+        padding: 16px 24px;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .landing-features,
+    .landing-services {
+        padding: 60px 24px;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .bento-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .features-header h2,
+    .services-header h2 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-content h1 {
+        font-size: 2.2rem;
+    }
+
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bento-wide {
+        grid-column: span 1;
+    }
+}
+
+/* ===== MOBILE NAV TOGGLE ===== */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 8px;
+    background: none;
+    border: none;
+    width: auto;
+}
+
+.nav-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--land-text-light);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex;
+    }
+}
+
+/* Stats counter section */
+.landing-stats {
+    display: flex;
+    gap: 48px;
+    margin-top: 48px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-number {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--land-cyan);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: rgba(241, 245, 249, 0.5);
+    margin-top: 6px;
+}
+
+@media (max-width: 768px) {
+    .landing-stats {
+        justify-content: center;
+        gap: 32px;
+    }
+}
