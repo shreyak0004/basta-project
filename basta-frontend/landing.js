@@ -75,6 +75,12 @@
 
     // --- Navigate to login/dashboard ---
     window.navigateToApp = function() {
+        // Close mobile landing menu overlay if open
+        const navLinks = document.querySelector('.nav-links');
+        if (navLinks) {
+            navLinks.classList.remove('mobile-open');
+        }
+
         const landingPage = document.getElementById('landingSection');
         const authSection = document.getElementById('authSection');
         const dashboardSection = document.getElementById('dashboardSection');
@@ -133,6 +139,19 @@
     document.addEventListener('DOMContentLoaded', () => {
         // Only run if landing page exists
         if (!document.getElementById('landingSection')) return;
+
+        // Dynamically change button label to "Dashboard" if logged in
+        try {
+            const savedUser = localStorage.getItem('basta_username');
+            if (savedUser) {
+                const navBtn = document.querySelector('.nav-btn');
+                if (navBtn) {
+                    navBtn.textContent = 'Dashboard';
+                }
+            }
+        } catch (e) {
+            console.error("Error checking session on landing load:", e);
+        }
 
         initRevealAnimations();
         animateCounters();

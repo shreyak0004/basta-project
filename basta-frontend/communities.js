@@ -9,6 +9,8 @@ let communityPolling = null;
 let cachedCommunities = [];
 let cachedMyCommunities = [];
 let lastCommunityStatusHash = null;
+window.currentCommunityRole = 'explorer';
+window.currentCommunityMembers = [];
 
 // Show discover panel and fetch all communities
 async function showCommunityDiscovery() {
@@ -19,6 +21,8 @@ async function showCommunityDiscovery() {
     activeCommunityId = null;
     activeCommunityName = "";
     lastCommunityStatusHash = null;
+    window.currentCommunityRole = 'explorer';
+    window.currentCommunityMembers = [];
 
     document.getElementById('stationChatPanel').classList.add('hidden');
     document.getElementById('stationDiscoverPanel').classList.remove('hidden');
@@ -227,6 +231,8 @@ async function leaveActiveCommunity() {
             activeCommunityId = null;
             activeCommunityName = "";
             lastCommunityStatusHash = null;
+            window.currentCommunityRole = 'explorer';
+            window.currentCommunityMembers = [];
             if (communityPolling) clearInterval(communityPolling);
             
             await fetchMyCommunities();
@@ -240,7 +246,7 @@ async function leaveActiveCommunity() {
     }
 }
 
-function selectCommunity(stationId, stationName) {
+async function selectCommunity(stationId, stationName) {
     activeCommunityId = stationId;
     activeCommunityName = stationName;
 
@@ -268,16 +274,129 @@ function selectCommunity(stationId, stationName) {
     document.getElementById('stationMessages').innerHTML = `<div style="text-align: center; color: var(--space-text-mute); font-size: 12px; margin-top: 20px;">Synchronizing logs...</div>`;
     lastCommunityStatusHash = null;
 
+    // Reset roles cache
+    window.currentCommunityRole = 'explorer';
+    window.currentCommunityMembers = [];
+    
+    // Load members list
+    await fetchCommunityMembers();
+
+    // Load message logs
     fetchCommunityMessages();
     
     if (communityPolling) clearInterval(communityPolling);
-    communityPolling = setInterval(fetchCommunityMessages, 3000);
+    communityPolling = setInterval(async () => {
+        await fetchCommunityMessages();
+    }, 3000);
+}
+
+// Fetch crew members of the active community
+async function fetchCommunityMembers() {
+    if (!activeCommunityId) return;
+
+    try {
+        const response = await fetch(`${API_URL}/stations/${activeCommunityId}/members`);
+        if (!response.ok) return;
+
+        const members = await response.json();
+        window.currentCommunityMembers = members;
+
+        const currentUser = localStorage.getItem('basta_username');
+        const myProfile = members.find(m => m.username === currentUser);
+        window.currentCommunityRole = myProfile ? myProfile.role : 'explorer';
+
+        renderCrewSidebar(members);
+    } catch (e) {
+        console.error("Error loading community members:", e);
+    }
+}
+
+// Render the crew list sidebar
+function renderCrewSidebar(members) {
+    const listContainer = document.getElementById('crewMembersList');
+    if (!listContainer) return;
+
+    listContainer.innerHTML = "";
+    const currentUser = localStorage.getItem('basta_username');
+
+    members.forEach(member => {
+        const div = document.createElement('div');
+        div.style.cssText = "display: flex; flex-direction: column; padding: 6px 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;";
+        
+        let roleBadge = "";
+        if (member.role === 'commander') {
+            roleBadge = `<span style="font-size: 9px; color: #ffaa00; font-family: 'Orbitron', sans-serif; font-weight: bold; letter-spacing: 0.5px;">[Commander 🚀]</span>`;
+        } else if (member.role === 'sub-commander') {
+            roleBadge = `<span style="font-size: 9px; color: var(--space-cyan); font-family: 'Orbitron', sans-serif; font-weight: bold; letter-spacing: 0.5px;">[Sub-Commander 🛰️]</span>`;
+        } else {
+            roleBadge = `<span style="font-size: 9px; color: #64748b;">[Crew ☄️]</span>`;
+        }
+
+        // Show "Promote" button only if current user is Commander and the target is a regular explorer
+        const isSelf = member.username === currentUser;
+        const canPromote = window.currentCommunityRole === 'commander' && member.role === 'explorer' && !isSelf;
+
+        const promoteBtn = canPromote
+            ? `<button onclick="promoteMember('${member.user_id}', '${member.username}')" style="width: auto; padding: 2px 6px; font-size: 8px; font-family: 'Orbitron', sans-serif; color: var(--space-cyan); border: 1px solid rgba(0, 180, 216, 0.4); background: rgba(0, 180, 216, 0.05); border-radius: 4px; margin-top: 4px; cursor: pointer; align-self: flex-start;">Promote 🚀</button>`
+            : '';
+
+        div.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 10px;">👨‍🚀</div>
+                <div style="display: flex; flex-direction: column; overflow: hidden;">
+                    <span style="font-size: 11px; font-weight: bold; color: #ffffff; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">@${member.username} ${isSelf ? '(You)' : ''}</span>
+                    ${roleBadge}
+                </div>
+            </div>
+            ${promoteBtn}
+        `;
+        listContainer.appendChild(div);
+    });
+}
+
+// Toggle Crew list display panel
+function toggleCrewList() {
+    const sidebar = document.getElementById('stationCrewSidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('hidden');
+    }
+}
+
+// Promote a user to sub-commander
+async function promoteMember(targetUserId, targetUsername) {
+    if (!confirm(`Are you sure you want to promote @${targetUsername} to Sub-Commander?`)) return;
+
+    const commanderId = localStorage.getItem('basta_user_id');
+    try {
+        const response = await fetch(`${API_URL}/stations/promote`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                stationId: activeCommunityId,
+                userId: targetUserId,
+                commanderId: commanderId
+            })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert(data.message || "Member promoted!");
+            await fetchCommunityMembers();
+        } else {
+            alert(data.error || "Failed to promote member.");
+        }
+    } catch (e) {
+        console.error("Error promoting member:", e);
+        alert("Network error executing promotion.");
+    }
 }
 
 async function deleteCommunityMessage(messageId) {
     if (!confirm("Are you sure you want to delete this community message?")) return;
+    
+    const currentUser = localStorage.getItem('basta_username');
     try {
-        const response = await fetch(`${API_URL}/stations/messages/${messageId}`, {
+        const response = await fetch(`${API_URL}/stations/messages/${messageId}?requester=${encodeURIComponent(currentUser)}`, {
             method: 'DELETE'
         });
         if (response.ok) {
@@ -340,7 +459,9 @@ async function fetchCommunityMessages() {
                     ? `<div style="font-size: 10px; color: var(--space-cyan); margin-bottom: 4px; font-weight: bold; font-family: 'Orbitron', sans-serif;">@${msg.sender_username}</div>`
                     : '';
 
-                const deleteBtn = isSent 
+                // Authorization check for message deletion (Sender OR Commander OR Sub-Commander)
+                const canDelete = isSent || window.currentCommunityRole === 'commander' || window.currentCommunityRole === 'sub-commander';
+                const deleteBtn = canDelete 
                     ? `<button class="delete-msg-btn" onclick="deleteCommunityMessage('${msg.id}')" title="Delete Message">🗑️</button>` 
                     : '';
 
