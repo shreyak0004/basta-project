@@ -142,3 +142,8 @@ Now, open your browser and navigate to: **`http://localhost:3000`**
     ├── communities.js        # Community dashboard controllers
     └── landing.js            # Landing page authentication logic
 ```
+# Basta – Secure File Sharing Web Application
+
+🌐 **Live Demo:** https://basta-project.vercel.app
+
+📂 **Source Code:** https://github.com/shreyak0004/Basta
